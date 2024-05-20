@@ -1,6 +1,6 @@
-import {Paper} from "@mui/material";
+import { Paper } from "@mui/material";
 
-const PageCourse = () => {
+const PageSearch = () => {
 
     return (
         <Paper elevation={2}
@@ -11,10 +11,10 @@ const PageCourse = () => {
                    height: 'auto',
                }}
         >
-            CORSI<br/>
+            RICERCA<br/>
             Work in progress...
         </Paper>
     );
 };
 
-export default PageCourse;
+export default PageSearch;

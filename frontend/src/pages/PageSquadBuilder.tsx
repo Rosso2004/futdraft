@@ -1,6 +1,6 @@
-import { Paper } from "@mui/material";
+import {Paper, TextField} from "@mui/material";
 
-const PageDashboard = () => {
+const PageSquadBuilder = () => {
 
     return (
         <Paper elevation={2}
@@ -11,10 +11,9 @@ const PageDashboard = () => {
                    height: 'auto',
                }}
         >
-            DASHBOARD<br/>
-            Work in progress...
+            <TextField id="outlined-basic" label="Outlined" variant="outlined" />
         </Paper>
     );
 };
 
-export default PageDashboard;
+export default PageSquadBuilder;

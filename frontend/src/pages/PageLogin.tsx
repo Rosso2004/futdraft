@@ -48,7 +48,7 @@ const PageLogin = () => {
             .then((response)=>{
                 if (response.status === 200) {
                     setIsVerified(true)
-                    navigate('/dashboard')
+                    navigate('/search')
                 }
             })
             .catch((error) => {
@@ -85,7 +85,7 @@ const PageLogin = () => {
                     color: '#bb0000',
                     fontWeight: 700,
                     textAlign: 'center',
-                }}>Kronos</Typography>
+                }}>Futdraft</Typography>
 
                 <Box component="form" noValidate sx={{ mt: 1 }} display="flex" flexDirection="column" alignItems="center" onSubmit={handleSubmit}>
                     <TextField
