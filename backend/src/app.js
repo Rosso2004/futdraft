@@ -1,6 +1,4 @@
-const courseRoutes=require("./routes/courseRoutes");
-const customerRoutes=require('./routes/customerRoutes');
-const relCourseCustomerRoutes=require('./routes/relCourseCustomerRoutes');
+const customerRoutes=require('./routes/userRoutes');
 const express=require('express');
 const cookieParser = require("cookie-parser");
 const dotenv = require('dotenv');
@@ -14,9 +12,9 @@ app.use(cors({credentials: true, origin: process.env.DOMAIN}));
 app.use(cookieParser());
 app.use(express.json());
 
-app.use('/api',courseRoutes,customerRoutes,relCourseCustomerRoutes);
+app.use('/api',customerRoutes);
+
 const port=5000;
 app.listen(port, () => {
-    console.log("Server is running on port ${port}");
-
+    console.log("Server is running on port ", port);
 });

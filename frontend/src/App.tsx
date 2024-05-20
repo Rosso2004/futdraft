@@ -2,7 +2,7 @@ import {Routes, Route, useLocation} from 'react-router-dom';
 import {ReactNode, useEffect} from 'react';
 import CmpLayout from "./components/layout/CmpLayout.tsx";
 import { useGlobalState } from "./global/GlobalStateContext.tsx";
-import { ToastContainer } from "react-toastify";
+import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {ConfigNavigation} from "./components/layout/ConfigNavigation.tsx";
 import useTokenCheck from "./utility/useTokenCheck.tsx";

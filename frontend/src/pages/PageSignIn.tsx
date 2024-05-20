@@ -3,34 +3,35 @@ import {
     Container,
     Typography,
     TextField,
-    InputAdornment, FormControl, InputLabel, OutlinedInput, IconButton, Button, FormHelperText, Link
+    InputAdornment, FormControl, InputLabel, OutlinedInput, IconButton, Button, Link,
 } from "@mui/material";
-import {Lock, Email, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Lock, Email, Visibility, VisibilityOff, TextFields} from "@mui/icons-material";
 import {inputStyle} from "../styles/CmpStyle.tsx";
 import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-import {useGlobalState} from "../global/GlobalStateContext.tsx";
+import {toast} from "react-toastify";
 
 interface ILoginData {
+    lastname: string,
+    firstname: string,
     email: string;
     password: string;
     error: {
         email: string;
-        password: string;
     }
 }
 
 const PageLogin = () => {
     const navigate = useNavigate();
-    const { setIsVerified } = useGlobalState();
 
-    const [loginData, setLoginData] = useState<ILoginData>({
+    const [loginData, setSignInData] = useState<ILoginData>({
+        lastname: '',
+        firstname: '',
         email: '',
         password: '',
         error: {
             email: '',
-            password: '',
         }
     });
     const [showPassword, setShowPassword] =useState(false);
@@ -40,33 +41,26 @@ const PageLogin = () => {
         event.preventDefault();
 
         const toSubmit = {
+            lastname: loginData.lastname,
+            firstname: loginData.firstname,
             email: loginData.email,
             password: loginData.password
         }
+
         await axios
-            .post(import.meta.env.VITE_URL_WEB_API + '/api/user/verifyUser', toSubmit, { withCredentials: true })
+            .post(import.meta.env.VITE_URL_WEB_API + '/api/user/createUser', toSubmit)
             .then((response)=>{
                 if (response.status === 200) {
-                    setIsVerified(true)
-                    navigate('/search')
+                    toast.success(response.data.message);
+                    navigate('/')
                 }
             })
             .catch((error) => {
-                if (error.response.status === 404) {
-                    setLoginData((prevData) => ({
+                if (error.response.status === 409) {
+                    setSignInData((prevData) => ({
                         ...prevData,
                         error: {
                             email: error.response.data,
-                            password: ''
-                        }
-                    }));
-                    console.log(error)
-                } else if (error.response.status === 401) {
-                    setLoginData((prevData) => ({
-                        ...prevData,
-                        error: {
-                            email: '',
-                            password: error.response.data
                         }
                     }));
                 }
@@ -85,9 +79,53 @@ const PageLogin = () => {
                     color: '#bb0000',
                     fontWeight: 700,
                     textAlign: 'center',
-                }}>Futdraft</Typography>
+                }}>Registrazione</Typography>
 
                 <Box component="form" noValidate sx={{ mt: 1 }} display="flex" flexDirection="column" alignItems="center" onSubmit={handleSubmit}>
+                    <TextField
+                        margin="dense"
+                        required
+                        fullWidth
+                        label="Cognome"
+                        value={loginData.lastname}
+                        onChange={(e) => {
+                            setSignInData((prevData) => ({
+                                ...prevData,
+                                lastname: e.target.value
+                            }))
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <TextFields />
+                                </InputAdornment>
+                            ),
+                        }}
+                        autoFocus
+                        sx={inputStyle}
+                    />
+                    <TextField
+                        margin="dense"
+                        required
+                        fullWidth
+                        label="Nome"
+                        value={loginData.firstname}
+                        onChange={(e) => {
+                            setSignInData((prevData) => ({
+                                ...prevData,
+                                firstname: e.target.value
+                            }))
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <TextFields />
+                                </InputAdornment>
+                            ),
+                        }}
+                        autoFocus
+                        sx={inputStyle}
+                    />
                     <TextField
                         margin="dense"
                         required
@@ -97,7 +135,7 @@ const PageLogin = () => {
                         helperText={loginData.error.email}
                         value={loginData.email}
                         onChange={(e) => {
-                            setLoginData((prevData) => ({
+                            setSignInData((prevData) => ({
                                 ...prevData,
                                 email: e.target.value
                             }))
@@ -112,7 +150,7 @@ const PageLogin = () => {
                         autoFocus
                         sx={inputStyle}
                     />
-                    <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth error={!!loginData.error.password}>
+                    <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth>
                         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
@@ -136,13 +174,12 @@ const PageLogin = () => {
 
                             value={loginData.password}
                             onChange={(e) => {
-                                setLoginData((prevData) => ({
+                                setSignInData((prevData) => ({
                                     ...prevData,
                                     password: e.target.value
                                 }))
                             }}
                         />
-                        <FormHelperText>{loginData.error.password}</FormHelperText>
                     </FormControl>
                     <Button type="submit" fullWidth variant="contained" sx={{
                         mt: 3,
@@ -152,8 +189,8 @@ const PageLogin = () => {
                         '&:hover': {
                             background: '#b60000',
                         },
-                    }}>Log In</Button>
-                    <Typography>Non sei registrato? <Link sx={{cursor: 'pointer'}} onClick={() => navigate('/signin')}>Registrati</Link></Typography>
+                    }}>Registrati</Button>
+                    <Typography>Sei già registrato? <Link sx={{cursor: 'pointer'}} onClick={() => navigate('/')}>Accedi</Link></Typography>
                 </Box>
             </Box>
         </Container>

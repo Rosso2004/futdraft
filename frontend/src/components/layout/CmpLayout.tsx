@@ -10,6 +10,10 @@ import { useGlobalState } from "../../global/GlobalStateContext";
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import {ConfigNavigation} from "./ConfigNavigation.tsx";
+import {IUser} from "../../interfaces/IUser.ts";
+import {useEffect, useState} from "react";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 const drawerWidth = 240;
 
@@ -84,6 +88,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 type ICmpLayout = React.PropsWithChildren<{
     title: string;
     maxWidth: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+    user?: IUser;
 }>
 
 const CmpLayout: React.FC<ICmpLayout> = (props) => {
@@ -117,6 +122,28 @@ const CmpLayout: React.FC<ICmpLayout> = (props) => {
         navigate(path);
     };
 
+    const [userData, setUserData] = useState<IUser>({
+        id: 0,
+        lastname: '',
+        firstname: '',
+        email: ''
+    });
+
+    const [avatarData, setAvatarData] = useState('');
+    const fetchUser = () => {
+        axios.get(import.meta.env.VITE_URL_WEB_API + '/api/user/getUser', { withCredentials: true })
+            .then(response => {
+                setUserData(response.data);
+            })
+            .catch(error => {
+                toast.error(error.response.message);
+            });
+    }
+    useEffect(() => {
+        fetchUser();
+        setAvatarData(userData.firstname[0])
+    }, [userData.firstname]);
+
     return (
         <>
             {isVerified ?
@@ -139,7 +166,7 @@ const CmpLayout: React.FC<ICmpLayout> = (props) => {
 
                                 <Tooltip title="Apri impostazioni" placement="top-end">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="Rosso Simone" />
+                                        <Avatar alt="Rosso Simone">{avatarData}</Avatar>
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
@@ -159,8 +186,13 @@ const CmpLayout: React.FC<ICmpLayout> = (props) => {
                                     onClose={handleCloseUserMenu}
                                 >
                                     <MenuItem onClick={() => {
+                                        handleNavigate("/profile");
+                                        handleCloseUserMenu();
+                                    }}>Profilo</MenuItem>
+                                    <MenuItem onClick={() => {
                                         setIsVerified(false);
                                         handleNavigate("/");
+                                        handleCloseUserMenu();
                                     }}>Esci</MenuItem>
                                 </Menu>
                             </Toolbar>

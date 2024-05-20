@@ -10,7 +10,7 @@ const useTokenCheck = () => {
 
     useEffect(() => {
         axios
-            .get(import.meta.env.VITE_URL_WEB_API + '/api/customer/checkToken', { withCredentials: true })
+            .get(import.meta.env.VITE_URL_WEB_API + '/api/user/checkToken', { withCredentials: true })
             .then((response) => {
                 if (response.status === 200) {
                     setIsVerified(true);

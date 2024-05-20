@@ -5,12 +5,12 @@ const authenticateToken = (req, res, next) => {
 
     if (token == null) return res.sendStatus(401)
 
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, email) => {
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {
         if (err) {
             return res.status(403).json({ status: 403, message: 'Sessione scaduta' });
         }
 
-        req.email = email
+        req.data = data
 
         next()
     })
