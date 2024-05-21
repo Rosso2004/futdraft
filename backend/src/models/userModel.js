@@ -16,7 +16,7 @@ class User{
         }
     }
 
-    static async updateUser(id, lastname,firstname,email,password) {
+    static async updateUser(id, lastname, firstname, email, password) {
         const [checkEmUs] = await db.query('SELECT id FROM users WHERE (email = ?) AND id != ?', [email, id]);
         if (checkEmUs.length > 0) {
             return { status: 409, message: 'Email già presente nel sistema' };
@@ -28,14 +28,15 @@ class User{
                 const dbPassword = checkResults[0].password;
                 const isMatch = await bcrypt.compare(password, dbPassword);
                 if (isMatch) {
-                    await db.query('UPDATE users SET lastname = ?, firstname = ?, email = ?, WHERE id = ?', [ lastname, firstname, email, id]);
-                    return {status: 200, message: 'Utente aggiornato con successo'};
+                    await db.query('UPDATE users SET lastname = ?, firstname = ?, email = ? WHERE id = ?', [lastname, firstname, email, id]);
+                    const [newUpd] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+
+                    return {status: 200, message: 'Utente aggiornato con successo', data: {id: newUpd[0].id, lastname: newUpd[0].lastname, firstname: newUpd[0].firstname, email: newUpd[0].email}};
                 } else {
                     return {status: 401, message: 'La password per modificare l\'utente non è corretta'};
                 }
             }
         }
-
     }
 
     static async verifyUser(email,password) {

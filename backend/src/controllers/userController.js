@@ -31,10 +31,11 @@ router.post('/createUser', async (req, res) => {
     }
 });
 
-router.put('/updateUser/:id', async (req, res) => {
+router.put('/updateUser/:id', authenticateToken, async (req, res) => {
     const { lastname,firstname,email,password} = req.body;
     const updCustomer = await User.updateUser(req.params.id, lastname,firstname,email,password );
     if (updCustomer.status === 200) {
+        res.cookie('token', generateAccessToken(updCustomer.data.id, updCustomer.data.lastname, updCustomer.data.firstname, updCustomer.data.email), { httpOnly:true });
         res.json(updCustomer);
     } else {
         res.status(updCustomer.status).json(updCustomer.message);

@@ -1,6 +1,6 @@
 import {
     Avatar, Button,
-    FormControl,
+    FormControl, FormHelperText,
     Grid,
     IconButton,
     InputAdornment,
@@ -12,6 +12,8 @@ import {IUser} from "../../interfaces/IUser.ts";
 import {Email, Lock, TextFields, Visibility, VisibilityOff} from "@mui/icons-material";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
 import {useEffect, useState} from "react";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 interface ICmpEditProfile {
     data: IUser
@@ -53,7 +55,54 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
             firstname: data.firstname,
             email: data.email
         }))
-    }, [data.email, data.firstname, data.lastname]);
+    }, [data.email, data.firstname, data.id, data.lastname]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const toSubmit = {
+            lastname: updateData.lastname,
+            firstname: updateData.firstname,
+            email: updateData.email,
+            password: updateData.password
+        }
+        await axios
+            .put(import.meta.env.VITE_URL_WEB_API + '/api/user/updateUser/'+updateData.id, toSubmit, { withCredentials: true })
+            .then((response)=>{
+                toast.success(response.data.message)
+                if (response.status === 200) {
+                    setUpdateData((prevData) => ({
+                        ...prevData,
+                        password: '',
+                        error: {
+                            email: '',
+                            password: '',
+                        }
+                    }))
+                }
+            })
+            .catch((error) => {
+                if (error.response.status === 409) {
+                    setUpdateData((prevData) => ({
+                        ...prevData,
+                        error: {
+                            email: error.response.data,
+                            password: ''
+                        }
+                    }));
+                    console.log(error)
+                } else if (error.response.status === 401) {
+                    setUpdateData((prevData) => ({
+                        ...prevData,
+                        error: {
+                            email: '',
+                            password: error.response.data
+                        }
+                    }));
+                }
+                console.log(error)
+            });
+    };
 
     return (
         <Grid container spacing={4}>
@@ -61,10 +110,9 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
                 <Avatar sx={{ width: 250, height: 250, margin: 'auto' }}>
                     {updateData.firstname[0]}
                 </Avatar>
-                {updateData.id}
             </Grid>
 
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={8} component='form' onSubmit={handleSubmit}>
                 <TextField
                     size="small"
                     margin="dense"
@@ -136,7 +184,7 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
                     autoFocus
                     sx={inputStyle}
                 />
-                <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth size="small">
+                <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth size="small" error={!!updateData.error.password}>
                     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                     <OutlinedInput
                         id="outlined-adornment-password"
@@ -166,6 +214,7 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
                             }))
                         }}
                     />
+                    <FormHelperText>{updateData.error.password}</FormHelperText>
                 </FormControl>
                 <Button type="submit" fullWidth variant="contained" sx={{
                     mt: 3,
