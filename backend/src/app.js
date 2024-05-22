@@ -1,4 +1,5 @@
 const customerRoutes=require('./routes/userRoutes');
+const playerRoutes=require('./routes/playerRoutes');
 const express=require('express');
 const cookieParser = require("cookie-parser");
 const dotenv = require('dotenv');
@@ -12,7 +13,7 @@ app.use(cors({credentials: true, origin: process.env.DOMAIN}));
 app.use(cookieParser());
 app.use(express.json());
 
-app.use('/api',customerRoutes);
+app.use('/api',customerRoutes, playerRoutes);
 
 const port=5000;
 app.listen(port, () => {

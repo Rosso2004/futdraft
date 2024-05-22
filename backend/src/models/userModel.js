@@ -53,7 +53,6 @@ class User{
             return { status: 401, message: 'Password non valida' };
         }
 
-        console.log(results)
         return { status: 200, message: 'Utente autenticato con successo', data: {id: results[0].id, lastname: results[0].lastname, firstname: results[0].firstname, email: results[0].email}};
     }
 

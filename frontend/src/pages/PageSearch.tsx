@@ -1,4 +1,5 @@
 import { Paper } from "@mui/material";
+import CmpSearchTable from "../components/search/CmpSearchTable.tsx";
 
 const PageSearch = () => {
 
@@ -11,8 +12,7 @@ const PageSearch = () => {
                    height: 'auto',
                }}
         >
-            RICERCA<br/>
-            Work in progress...
+            <CmpSearchTable/>
         </Paper>
     );
 };
