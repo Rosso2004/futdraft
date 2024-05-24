@@ -16,6 +16,7 @@ import { IPlayer } from '../../interfaces/IPlayer';
 import {Typography, TableSortLabel, TablePagination, TextField} from "@mui/material";
 import { useEffect } from "react";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
+import CmpProgress from "../progress/CmpProgress.tsx";
 
 interface HeadCell {
     id: keyof IPlayer;
@@ -67,6 +68,8 @@ function Row(props: { row: IPlayer; index: number }) {
                         <Box sx={{ margin: 1 }}>
                             <Typography variant="h6" gutterBottom component="div">
                                 Dettagli
+                                {row.average_clean_sheet}
+                                <CmpProgress/>
                             </Typography>
                             {/* Aggiungi qui ulteriori dettagli dell'utente */}
                         </Box>
@@ -84,12 +87,14 @@ export default function CmpSearchTable() {
     const [orderBy, setOrderBy] = React.useState<keyof IPlayer>('lastname');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [filters, setFilters] = React.useState<{ [key in keyof IPlayer]?: string }>({});
+
 
     useEffect(() => {
         axios.get<IPlayer[]>(import.meta.env.VITE_URL_WEB_API + '/api/player/getAllPlayer', { withCredentials: true })
             .then(response => {
                 setPlayers(response.data);
-                setFilteredPlayers(response.data); // Inizializza i dati filtrati con i dati completi
+                setFilteredPlayers(response.data);
             })
             .catch(error => {
                 console.error('Errore nel recupero dei dati:', error);
@@ -114,9 +119,22 @@ export default function CmpSearchTable() {
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, property: keyof IPlayer) => {
         const { value } = event.target;
-        const filtered = players.filter(player =>
-            player && player[property] && player[property]!.toString().toLowerCase().includes(value.toLowerCase())
-        );
+        const newFilters = { ...filters, [property]: value.toLowerCase() };
+        setFilters(newFilters);
+
+        const filtered = players.filter(player => {
+            return Object.keys(newFilters).every((key) => {
+                const prop = key as keyof IPlayer;
+                const filterValue = newFilters[prop];
+                if (filterValue) {
+                    if (prop === 'role') {
+                        return player[prop].name.toLowerCase().includes(filterValue);
+                    }
+                    return player[prop]!.toString().toLowerCase().includes(filterValue);
+                }
+                return true;
+            });
+        });
         setFilteredPlayers(filtered);
     };
 
@@ -166,7 +184,9 @@ export default function CmpSearchTable() {
                                     required
                                     fullWidth
                                     placeholder={`Filtra per ${headCell.label}`}
-                                    onChange={(e) => handleFilterChange(e, headCell.id)}
+                                    onChange={(e) => {
+                                        handleFilterChange(e, headCell.id)
+                                    }}
                                     autoFocus
                                     sx={{
                                         ...inputStyle,
