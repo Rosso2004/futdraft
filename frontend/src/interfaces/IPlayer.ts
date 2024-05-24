@@ -17,6 +17,7 @@ export interface IPlayer {
     average_advances: number | null;
     avarage_yellow_season: number | null;
     average_passing_accuracy: number | null;
+    average_balls_recovered: number | null;
     average_assist: number | null;
     career_goal: number | null;
     average_goal: number | null;

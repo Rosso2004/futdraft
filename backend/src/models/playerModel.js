@@ -24,13 +24,14 @@ class Player{
             'players.average_advances,' +
             'players.avarage_yellow_season,' +
             'players.average_passing_accuracy,' +
+            'players.average_balls_recovered,' +
             'players.average_assist,' +
             'players.career_goal,' +
             'players.average_goal,' +
             'players.average_dribbling,' +
             'players.average_shots_on_goal ' +
             'FROM players INNER JOIN roles ON players.role=roles.id');
-        const data = results.map((row) => ({
+        return results.map((row) => ({
             id: row.id,
             lastname: row.lastname,
             firstname: row.firstname,
@@ -50,14 +51,13 @@ class Player{
             average_advances: row.average_advances,
             avarage_yellow_season: row.avarage_yellow_season,
             average_passing_accuracy: row.average_passing_accuracy,
+            average_balls_recovered: row.average_balls_recovered,
             average_assist: row.average_assist,
             career_goal: row.career_goal,
             average_goal: row.average_goal,
             average_dribbling: row.average_dribbling,
             average_shots_on_goal: row.average_shots_on_goal,
         }));
-
-        return data;
     }
 }
 
