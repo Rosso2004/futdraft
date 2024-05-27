@@ -15,12 +15,12 @@ const CmpSquadBuilderModule: React.FC<CmpSquadBuilderModuleProps> = (props) => {
     };
 
     const menuItems = [
-        { label: '4-3-3', value: [4, 3, 3] },
-        { label: '4-4-2', value: [4, 4, 2] },
-        { label: '3-5-2', value: [3, 5, 2] },
-        { label: '3-4-1-2', value: [3, 4, 1, 2] },
-        { label: '4-5-1', value: [4, 5, 1] },
-        { label: '4-2-3-1', value: [4, 2, 3, 1] },
+        { label: '4-3-3', value: [3, 3, 4, 1] },
+        { label: '4-4-2', value: [2, 4, 4, 1] },
+        { label: '3-5-2', value: [2, 5, 3, 1] },
+        { label: '3-4-1-2', value: [2, 1, 4, 3, 1] },
+        { label: '4-5-1', value: [1, 5, 4, 1] },
+        { label: '4-2-3-1', value: [1, 3, 2, 4] },
     ];
 
     return (
@@ -40,7 +40,9 @@ const CmpSquadBuilderModule: React.FC<CmpSquadBuilderModuleProps> = (props) => {
                     input={<OutlinedInput label="Modulo" />}
                     renderValue={(selected) => {
                         const selectedModule = JSON.parse(selected) as number[];
-                        return selectedModule.join('-');
+                        selectedModule.splice(-1)
+
+                        return selectedModule.reverse().join('-');
                     }}
                 >
                     {menuItems.map((item) => (

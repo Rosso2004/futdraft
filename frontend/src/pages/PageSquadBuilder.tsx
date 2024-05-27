@@ -1,6 +1,6 @@
 import {Grid} from "@mui/material";
-import CmpSquadBuilderModule from "../components/squadBuilder/CmpSquadBuilderModule.tsx";
-import CmpSquadBuilderForm from "../components/squadBuilder/CmpSquadBuilderForm.tsx";
+import  CmpSquadBuilderModule from "../components/squadBuilder/CmpSquadBuilderModule.tsx";
+import CmpSquadBuilderForm from "../components/squadBuilder/form/CmpSquadBuilderForm.tsx";
 import {useState} from "react";
 
 const PageSquadBuilder = () => {

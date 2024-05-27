@@ -178,7 +178,7 @@ const CmpSearchTable = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [filters, setFilters] = React.useState<{ [key in keyof IPlayer]?: string }>({});
 
-    useEffect(() => {
+    const fetchPlayers = () => {
         axios.get<IPlayer[]>(import.meta.env.VITE_URL_WEB_API + '/api/player/getAllPlayer', {withCredentials: true})
             .then(response => {
                 setPlayers(response.data);
@@ -187,6 +187,10 @@ const CmpSearchTable = () => {
             .catch(error => {
                 console.error('Errore nel recupero dei dati:', error);
             });
+    }
+
+    useEffect(() => {
+        fetchPlayers();
     }, []);
 
     const handleRequestSort = (property: keyof IPlayer) => {
