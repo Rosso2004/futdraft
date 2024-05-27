@@ -1,4 +1,4 @@
-import {Box, Fab, Grid, IconButton, Paper} from "@mui/material";
+import {Box, Button, Fab, Grid, IconButton, Paper} from "@mui/material";
 import {Add, Delete} from '@mui/icons-material';
 import React, {useEffect, useState} from "react";
 import CmpSquadBuilderModal from "./CmpSquadBuilderModal.tsx";
@@ -98,6 +98,8 @@ const CmpSquadBuilderForm: React.FC<CmpSquadBuilderModuleProps> = (props) => {
                     </Grid>
                 ))}
             </Grid>
+            <Button sx={{my: 5}} onClick={() => console.log((selectedPlayers))}>Salva</Button>
+
             <CmpSquadBuilderModal
                 open={modalState.open}
                 onClose={handleClose}

@@ -25,7 +25,6 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                     const filteredPlayers = response.data.filter(player => player.role.id === role.id);
                     setPlayers(filteredPlayers);
                     setPlayers(filteredPlayers.filter(player => {
-                        // Filtra i giocatori disponibili escludendo quelli già selezionati
                         return !selectedPlayers.flat().some(selectedPlayer => selectedPlayer?.id === player.id);
                     }));
                 })
