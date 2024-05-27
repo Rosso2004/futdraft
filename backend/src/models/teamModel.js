@@ -5,6 +5,12 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 class Team{
+    static async getTeam(user) {
+        const [checkResults] = await db.query('SELECT * FROM teams WHERE user = ?', [user]);
+        console.log(checkResults)
+        return checkResults;
+    }
+
     static async createTeam(user,name,team) {
         const [checkResults] = await db.query('SELECT name FROM teams WHERE name = ?', [name]);
         if (checkResults.length > 0) {

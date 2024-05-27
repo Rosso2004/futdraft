@@ -75,7 +75,7 @@ INSERT INTO `players` (`id`, `lastname`, `firstname`, `age`, `height`, `weight`,
 	(23, 'Fabinho', '', 30, 1.88, 79, 3, 35000000, NULL, NULL, NULL, NULL, 1, 0.9, 0.2, 0.91, 5.4, 1, 15, 0.05, 1.4, 0.8),
 	(24, 'Salah', 'Mohamed', 31, 1.75, 71, 4, 90000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.74, NULL, 0.6, 250, 0.8, 1.9, 2.7),
 	(25, 'Lloris', 'Hugo', 37, 1.88, 78, 1, 2000000, NULL, 0.38, 4.2, 1.2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-	(26, 'Alaba', 'David', 32, 1.8, 75, 2, 30000000, NULL, NULL, NULL, NULL, 2, 0.7, 0.3, 0.9, 5, 0.4, 20, 0.1, NULL, NULL),
+	(26, 'Alaba', 'David', 32, 1.8, 75, 2, 30000000, 'https://i.ibb.co/tQBFm79/p50188-t186-2023-1-001-000.png', NULL, NULL, NULL, 2, 0.7, 0.3, 0.9, 5, 0.4, 20, 0.1, NULL, NULL),
 	(27, 'Busquets', 'Sergio', 35, 1.89, 76, 3, 20000000, NULL, NULL, NULL, NULL, 1.2, 0.8, 0.3, 0.93, 5.7, 1.2, 15, 0.04, 1.5, 0.6),
 	(28, 'Mbappe', 'Kylian', 25, 1.78, 73, 4, 200000000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.79, NULL, 0.5, 150, 0.9, 2.3, 3.8),
 	(29, 'Ter Stegen', 'Marc-André', 32, 1.87, 85, 1, 60000000, NULL, 0.37, 4.5, 1.2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -94,6 +94,22 @@ INSERT INTO `roles` (`id`, `name`) VALUES
 	(2, 'Difensore'),
 	(3, 'Centrocampista'),
 	(4, 'Attaccante');
+
+-- Dump della struttura di tabella futdraft.teams
+CREATE TABLE IF NOT EXISTS `teams` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `user` int(11) DEFAULT NULL,
+  `team` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_teams_users` (`user`),
+  CONSTRAINT `FK_teams_users` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Dump dei dati della tabella futdraft.teams: ~0 rows (circa)
+INSERT INTO `teams` (`id`, `name`, `user`, `team`) VALUES
+	(4, 'Team 2', 10, 'Simoneasd'),
+	(5, 'Team 1', 10, 'Simoneasd');
 
 -- Dump della struttura di tabella futdraft.users
 CREATE TABLE IF NOT EXISTS `users` (

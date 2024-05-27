@@ -6,10 +6,11 @@ const jwt = require("jsonwebtoken");
 const router=express.Router();
 
 
-// router.get('/getTeam',authenticateToken, async(req,res)=>{
-//     const { id, email, firstname, lastname } = req.data;
-//     res.json({ id: id, lastname: lastname, firstname: firstname, email: email });
-// });
+router.get('/getTeam',authenticateToken, async(req,res)=>{
+    const { id } = req.data;
+    const teams = await Team.getTeam(id);
+    res.json(teams);
+});
 
 router.post('/createTeam', authenticateToken, async (req, res) => {
     const { name,team } = req.body;
