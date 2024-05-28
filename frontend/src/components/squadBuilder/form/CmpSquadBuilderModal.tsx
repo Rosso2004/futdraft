@@ -80,7 +80,7 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                     >
                         {players.map((player) => (
                             <MenuItem key={player.id} value={JSON.stringify(player)}>
-                                {player.lastname} {player.firstname} - {player.price}€
+                                {player.lastname} {player.firstname} - € {player.price.toLocaleString('it-IT')}
                             </MenuItem>
                         ))}
                     </Select>

@@ -41,8 +41,10 @@ function Row(props: { row: IPlayer; index: number }) {
         <React.Fragment>
             <TableRow
                 sx={{
-                    '& > *': { borderBottom: index % 2 === 0 ? '#ffffff' : '#fbfbfb' },
-                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb', // Cambio del colore di sfondo per righe alternative
+                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb',
+                    '& > *': {
+                        borderBottom: open ? 'none' : undefined,
+                    },
                 }}
             >
                 <TableCell>
@@ -63,7 +65,7 @@ function Row(props: { row: IPlayer; index: number }) {
                 <TableCell>€ {row.price.toLocaleString('it-IT')}</TableCell>
             </TableRow>
             <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8} sx={{backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb' }}>
+                <TableCell colSpan={8} sx={{backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb', py: 0, borderBottom: !open ? 'none' : undefined, }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
                             <Typography variant="h6" gutterBottom component="div">

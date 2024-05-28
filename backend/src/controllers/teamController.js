@@ -13,9 +13,9 @@ router.get('/getTeam',authenticateToken, async(req,res)=>{
 });
 
 router.post('/createTeam', authenticateToken, async (req, res) => {
-    const { name,team } = req.body;
+    const { name,team,price } = req.body;
     const { id } = req.data;
-    const newTeam = await Team.createTeam(id,name,team);
+    const newTeam = await Team.createTeam(id,name,team,price);
     if (newTeam.status === 200) {
         res.json(newTeam);
     } else {

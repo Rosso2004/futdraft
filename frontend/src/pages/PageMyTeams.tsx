@@ -1,4 +1,5 @@
 import { Paper } from "@mui/material";
+import CmpMyTeamsTable from "../components/myTeams/CmpMyTeamsTable.tsx";
 
 const PageSearch = () => {
 
@@ -11,8 +12,7 @@ const PageSearch = () => {
                    height: 'auto',
                }}
         >
-            MYTEAMS<br/>
-            Work in progress...
+            <CmpMyTeamsTable/>
         </Paper>
     );
 };
