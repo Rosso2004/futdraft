@@ -23,6 +23,16 @@ router.post('/createTeam', authenticateToken, async (req, res) => {
     }
 });
 
+router.put('/updateTeam/:id', authenticateToken, async (req, res) => {
+    const { team,price } = req.body;
+    const newTeam = await Team.updateTeam(req.params.id,team,price);
+    if (newTeam.status === 200) {
+        res.json(newTeam);
+    } else {
+        res.status(newTeam.status).json(newTeam.message);
+    }
+});
+
 
 module.exports=router;
 

@@ -12,12 +12,15 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {Typography, TableSortLabel, TablePagination, TextField, Grid} from "@mui/material";
-import { useEffect } from "react";
+import {Typography, TableSortLabel, TablePagination, TextField, Grid, Fab, Button} from "@mui/material";
+import {useEffect, useMemo, useState} from "react";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
-import CmpProgress from "../progress/CmpProgress.tsx";
 import {ITeam} from "../../interfaces/ITeam.ts";
 import {IPlayer} from "../../interfaces/IPlayer.ts";
+import {Add, Delete} from "@mui/icons-material";
+import {IRole} from "../../interfaces/IRole.ts";
+import CmpSquadBuilderModal from "../squadBuilder/form/CmpSquadBuilderModal.tsx";
+import {toast} from "react-toastify";
 
 interface HeadCell {
     id: keyof ITeam;
@@ -29,10 +32,102 @@ const headCells: HeadCell[] = [
     { id: 'price', label: 'Prezzo' },
 ];
 
-function Row(props: { row: ITeam; index: number }) {
-    const { row, index } = props;
+interface IToSubmit {
+    team: (IPlayer | null)[][];
+    price: number;
+}
+
+function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
+    const { row, index, fetchPlayers } = props;
     const [open, setOpen] = React.useState(false);
-    console.log(row)
+    const [modalState, setModalState] = useState({ open: false, role: { id: 0, name: '' }, position: { row: 0, col: 0 } });
+    const module = useMemo(() => {
+        return row.team.map((io) => io.length);
+    }, [row.team]);
+    const [teamData, setTeamData] = useState<IToSubmit>({
+        team: row.team,
+        price: row.price
+    });
+    const [isModified, setIsModified] = useState(false);
+
+    useEffect(() => {
+        const hasChanges = JSON.stringify(teamData.team) !== JSON.stringify(row.team);
+        setIsModified(hasChanges);
+    }, [teamData, row.team]);
+
+    const handleRemovePlayer = (rowIndex: number, colIndex: number) => {
+        const playerPrice = teamData.team[rowIndex][colIndex]?.price ?? 0;
+        const newPrice = teamData.price - playerPrice;
+        const newTeam = teamData.team.map((teamRow, i) =>
+            teamRow.map((player, j) => (i === rowIndex && j === colIndex ? null : player))
+        );
+
+        setTeamData({
+            team: newTeam,
+            price: newPrice,
+        });
+
+        const hasChanges = JSON.stringify(newTeam) !== JSON.stringify(row.team);
+        setIsModified(hasChanges);
+    };
+
+    const handlePlayerSelect = (player: IPlayer) => {
+        const newPrice = teamData.price + player.price
+        setTeamData(prevState => {
+            const newTeam = prevState.team.map(row => [...row]);
+            newTeam[modalState.position.row][modalState.position.col] = player;
+            return { ...prevState, price: newPrice, team: newTeam };
+        });
+    };
+
+    const handleFabClick = (rowIndex: number, colIndex: number) => {
+        const roles5 = [{ id: 4, name: 'Attaccante' }, { id: 3, name: 'Centrocampista' }, { id: 3, name: 'Centrocampista' }, { id: 2, name: 'Difensore' }, { id: 1, name: 'Portiere' }];
+        const roles4 = [{ id: 4, name: 'Attaccante' }, { id: 3, name: 'Centrocampista' }, { id: 2, name: 'Difensore' }, { id: 1, name: 'Portiere' }];
+        let role = { id: 0, name: '' };
+
+        if (module.length === 5) {
+            role = roles5[rowIndex];
+        } else if (module.length === 4) {
+            role = roles4[rowIndex];
+        }
+
+        handleOpen(role, rowIndex, colIndex);
+    };
+
+    const handleOpen = (role: IRole, rowIndex: number, colIndex: number) => {
+        setModalState({ open: true, role, position: { row: rowIndex, col: colIndex } });
+    };
+
+    const handleClose = () => setModalState({ open: false, role: { id: 0, name: '' }, position: { row: 0, col: 0 } });
+
+    const handleSubmit = async() => {
+        for (const row of teamData.team) {
+            for (const player of row) {
+                if (player === null) {
+                    toast.error('Assicurati che siano stati inseriti dei giocatori in tutte le posizioni');
+                    return;
+                }
+            }
+        }
+
+        const toSubmit = {
+            team: JSON.stringify(teamData.team),
+            price: teamData.price
+        }
+
+        await axios
+            .put(import.meta.env.VITE_URL_WEB_API + '/api/team/updateTeam/' + row.id, toSubmit, { withCredentials: true })
+            .then((response)=>{
+                if (response.status === 200) {
+                    toast.success(response.data.message);
+                    fetchPlayers();
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    };
+
     return (
         <React.Fragment>
             <TableRow
@@ -45,7 +140,6 @@ function Row(props: { row: ITeam; index: number }) {
             >
                 <TableCell>
                     <IconButton
-                        aria-label="expand row"
                         size="small"
                         onClick={() => setOpen(!open)}
                     >
@@ -54,110 +148,82 @@ function Row(props: { row: ITeam; index: number }) {
                 </TableCell>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>€ {row.price.toLocaleString('it-IT')}</TableCell>
+                <TableCell align='right'>
+                    <IconButton
+                        sx={{color:'#DD0000'}}
+                        size="small"
+                        onClick={() => setOpen(!open)}
+                    >
+                        <Delete/>
+                    </IconButton>
+                </TableCell>
             </TableRow>
-            {/*<TableRow>*/}
-            {/*    <TableCell colSpan={8} sx={{backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb', py: 0, borderBottom: !open ? 'none' : undefined, }}>*/}
-            {/*        <Collapse in={open} timeout="auto" unmountOnExit>*/}
-            {/*            <Box sx={{ margin: 1 }}>*/}
-            {/*                <Typography variant="h6" gutterBottom component="div">*/}
-            {/*                    Dettagli*/}
-            {/*                </Typography>*/}
+            <TableRow>
+                <TableCell colSpan={8} sx={{backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb', py: 0, borderBottom: !open ? 'none' : undefined, }}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ margin: 1 }} component='form' onSubmit={handleSubmit}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                Team
+                            </Typography>
 
-            {/*                <Grid container columnSpacing={2}>*/}
-            {/*                    {row.photo_url && (*/}
-            {/*                        <Grid item xs={3}>*/}
-            {/*                            <Paper elevation={2}>*/}
-            {/*                                <img style={{ width: '100%', height: 'auto' }} src={row.photo_url} alt={row.lastname + ' ' + row.firstname}></img>*/}
-            {/*                            </Paper>*/}
-            {/*                        </Grid>*/}
-            {/*                    )}*/}
-            {/*                    <Grid item xs={row.photo_url ? 9 : 12}>*/}
-            {/*                        <Grid container rowSpacing={2} columnSpacing={2}>*/}
-            {/*                            {row.average_clean_sheet && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Cleansheet:*/}
-            {/*                                    <CmpProgress value={row.average_clean_sheet} maxValue={1}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_save && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Parate:*/}
-            {/*                                    <CmpProgress value={row.average_save} maxValue={7}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_goals_conceded && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Goal Subiti:*/}
-            {/*                                    <CmpProgress value={row.average_goals_conceded} maxValue={5}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_contrasts_won && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Contrasti Vinti:*/}
-            {/*                                    <CmpProgress value={row.average_contrasts_won} maxValue={5}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_advances && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Anticipi:*/}
-            {/*                                    <CmpProgress value={row.average_advances} maxValue={4}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.avarage_yellow_season && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Gialli Stagionali:*/}
-            {/*                                    <CmpProgress value={row.avarage_yellow_season} maxValue={1}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_passing_accuracy && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Precisione Passaggi:*/}
-            {/*                                    <CmpProgress value={row.average_passing_accuracy} maxValue={1}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_balls_recovered && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Palle Recuperate:*/}
-            {/*                                    <CmpProgress value={row.average_balls_recovered} maxValue={10}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_assist && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Assist:*/}
-            {/*                                    <CmpProgress value={row.average_assist} maxValue={2}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_goal && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Goal:*/}
-            {/*                                    <CmpProgress value={row.average_goal} maxValue={2}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_dribbling && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Dribbling:*/}
-            {/*                                    <CmpProgress value={row.average_dribbling} maxValue={4}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                            {row.average_shots_on_goal && (*/}
-            {/*                                <Grid item xs={row.photo_url ? 6 : 4}>*/}
-            {/*                                    Media Tiri in Porta:*/}
-            {/*                                    <CmpProgress value={row.average_shots_on_goal} maxValue={5}/>*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
+                            <Grid container spacing={10} justifyContent="center" sx={{mb: 5}}>
+                                {module.map((item, rowIndex) => (
+                                    <Grid
+                                        container
+                                        item
+                                        xs={12}
+                                        justifyContent="center"
+                                        key={rowIndex}
+                                    >
+                                        {Array.from({ length: item }).map((_, colIndex) => (
+                                            <Grid item key={colIndex} xs={12 / item} sx={{ display: 'flex', justifyContent: 'center', alignItems:'center'}}>
+                                                {teamData.team[rowIndex] && teamData.team[rowIndex][colIndex] ? (
+                                                    <Paper elevation={1} sx={{display:'flex', flexDirection:'column' }}>
+                                                        <img
+                                                            src={teamData.team[rowIndex][colIndex]?.photo_url || undefined}
+                                                            style={{ width: '150px', height: 'auto' }}
+                                                        />
+                                                        <Box sx={{display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'center', justifyItems:'center', px: 1}}>
+                                                            {`${teamData.team[rowIndex][colIndex]?.firstname} ${teamData.team[rowIndex][colIndex]?.lastname}`}
+                                                            <IconButton onClick={() => handleRemovePlayer(rowIndex, colIndex)}>
+                                                                <Delete />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </Paper>
+                                                ) : (
+                                                    <Fab onClick={() => handleFabClick(rowIndex, colIndex)}>
+                                                        <Add />
+                                                    </Fab>
+                                                )}
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                ))}
+                            </Grid>
+                            {isModified && (
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <Box display="flex" justifyContent="flex-end" alignItems='center' mt={1}>
+                                            <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
+                                                Nuovo prezzo: € {teamData.price.toLocaleString('it-IT')}
+                                            </Typography>
+                                            <Button type='submit'>Salva</Button>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            )}
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
 
-            {/*                            {row.career_goal && (*/}
-            {/*                                <Grid item xs={12}>*/}
-            {/*                                    Goal durante la carriera: {row.career_goal}*/}
-            {/*                                </Grid>*/}
-            {/*                            )}*/}
-            {/*                        </Grid>*/}
-            {/*                    </Grid>*/}
-            {/*                </Grid>*/}
-            {/*            </Box>*/}
-            {/*        </Collapse>*/}
-            {/*    </TableCell>*/}
-            {/*</TableRow>*/}
+            <CmpSquadBuilderModal
+                open={modalState.open}
+                onClose={handleClose}
+                role={modalState.role}
+                onPlayerSelect={handlePlayerSelect}
+                selectedPlayers={teamData.team}
+            />
         </React.Fragment>
     );
 }
@@ -294,11 +360,12 @@ const CmpMyTeamsTable = () => {
                                 />
                             </TableCell>
                         ))}
+                        <TableCell/>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {paginatedTeams.map((player, index) => (
-                        <Row key={player.id} row={player} index={index}/>
+                        <Row key={player.id} row={player} index={index} fetchPlayers={fetchPlayers}/>
                     ))}
                 </TableBody>
             </Table>

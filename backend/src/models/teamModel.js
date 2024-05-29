@@ -18,6 +18,12 @@ class Team{
             return { status: 200, message: 'Il team ' + name + ' è stato salvato con successo' };
         }
     }
+
+    static async updateTeam(id,team,price) {
+        const [res] = await db.query('SELECT name FROM teams WHERE id = ?', [id]);
+        await db.query('UPDATE teams SET team = ?, price = ? WHERE id = ?', [team, price, id]);
+        return { status: 200, message: 'Il team ' + res[0].name + ' è stato aggiornato con successo' };
+    }
 }
 
 module.exports= Team;

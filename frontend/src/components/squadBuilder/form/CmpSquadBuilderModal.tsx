@@ -1,9 +1,17 @@
-import {Modal, Paper, Typography, MenuItem, Select, FormControl, InputLabel, SelectChangeEvent, Button} from '@mui/material';
+import {
+    Modal,
+    Paper,
+    Typography,
+    FormControl,
+    Button,
+    Autocomplete, TextField, InputAdornment
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { IPlayer } from "../../../interfaces/IPlayer.ts";
 import { IRole } from "../../../interfaces/IRole.ts";
 import {inputStyle} from "../../../styles/CmpStyle.tsx";
+import {PersonAdd} from "@mui/icons-material";
 
 interface ICmpSquadBuilderModal {
     open: boolean;
@@ -34,9 +42,8 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
         }
     }, [open, role.id, selectedPlayers]);
 
-    const handlePlayerChange = (event: SelectChangeEvent<string>) => {
-        const player = JSON.parse(event.target.value) as IPlayer;
-        setSelectedPlayer(player);
+    const handlePlayerChange = (_event: React.SyntheticEvent<Element, Event>, newValue: IPlayer | null) => {
+        setSelectedPlayer(newValue);
     };
 
     const handlePlayerSelect = () => {
@@ -70,20 +77,31 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                 <Typography id="modal-description" sx={{ mt: 2 }}>
                     Numero di giocatori disponibili: {players.length}
                 </Typography>
-                <FormControl fullWidth sx={{...inputStyle, mt: 2}} size="small">
-                    <InputLabel id="select-player-label">Giocatore</InputLabel>
-                    <Select
-                        labelId="select-player-label"
-                        value={selectedPlayer ? JSON.stringify(selectedPlayer) : ''}
+                <FormControl fullWidth sx={{ ...inputStyle, mt: 2 }}>
+                    <Autocomplete
+                        options={players}
+                        size='small'
+                        getOptionLabel={(player) => `${player.lastname} ${player.firstname} - € ${player.price.toLocaleString('it-IT')}`}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Giocatore"
+                                variant="outlined"
+                                InputProps={{
+                                    ...params.InputProps,
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <PersonAdd />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        )}
+                        value={selectedPlayer}
                         onChange={handlePlayerChange}
-                        label="Giocatore"
-                    >
-                        {players.map((player) => (
-                            <MenuItem key={player.id} value={JSON.stringify(player)}>
-                                {player.lastname} {player.firstname} - € {player.price.toLocaleString('it-IT')}
-                            </MenuItem>
-                        ))}
-                    </Select>
+
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                    />
                 </FormControl>
                 <Button
                     variant="contained"

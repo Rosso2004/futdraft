@@ -41,22 +41,6 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
         }));
     }, [module]);
 
-    // useEffect(() => {
-    //     // const totalPlayerPrice = teamData.team.flat().reduce((acc, player) => acc + (player?.price || 0), 0);
-    //     // const newPrice = budget - totalPlayerPrice;
-    //     //
-    //     //
-    //     // setTeamData((prevData) => ({
-    //     //     ...prevData,
-    //     //     price: newPrice
-    //     // }));
-    //     if (teamData.price > budget) {
-    //         console.log('ROSSO')
-    //     } else {
-    //         console.log('VERDE')
-    //     }
-    // }, [budget, teamData.price, teamData.team]);
-
     const handleOpen = (role: IRole, rowIndex: number, colIndex: number) => {
         setModalState({ open: true, role, position: { row: rowIndex, col: colIndex } });
     };
