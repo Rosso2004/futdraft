@@ -33,6 +33,15 @@ router.put('/updateTeam/:id', authenticateToken, async (req, res) => {
     }
 });
 
+router.delete('/deleteTeam/:id', authenticateToken, async (req, res) => {
+    const delTeam = await Team.deleteTeam(req.params.id);
+    if (delTeam.status === 200) {
+        res.json(delTeam);
+    } else {
+        res.status(delTeam.status).json(delTeam.message);
+    }
+});
+
 
 module.exports=router;
 

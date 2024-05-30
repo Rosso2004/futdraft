@@ -21,6 +21,7 @@ import {Add, Delete} from "@mui/icons-material";
 import {IRole} from "../../interfaces/IRole.ts";
 import CmpSquadBuilderModal from "../squadBuilder/form/CmpSquadBuilderModal.tsx";
 import {toast} from "react-toastify";
+import CmpMyTeamsDelete from "./CmpMyTeamsDelete.tsx";
 
 interface HeadCell {
     id: keyof ITeam;
@@ -41,9 +42,12 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
     const { row, index, fetchPlayers } = props;
     const [open, setOpen] = React.useState(false);
     const [modalState, setModalState] = useState({ open: false, role: { id: 0, name: '' }, position: { row: 0, col: 0 } });
+    const [modalDeleteState, setModalDeleteState] = useState({ open: false});
+
     const module = useMemo(() => {
         return row.team.map((io) => io.length);
     }, [row.team]);
+
     const [teamData, setTeamData] = useState<IToSubmit>({
         team: row.team,
         price: row.price
@@ -99,6 +103,7 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
     };
 
     const handleClose = () => setModalState({ open: false, role: { id: 0, name: '' }, position: { row: 0, col: 0 } });
+    const handleDeleteClose = () => setModalDeleteState({ open: false});
 
     const handleSubmit = async() => {
         for (const row of teamData.team) {
@@ -152,7 +157,7 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
                     <IconButton
                         sx={{color:'#DD0000'}}
                         size="small"
-                        onClick={() => setOpen(!open)}
+                        onClick={() => setModalDeleteState({ open: true})}
                     >
                         <Delete/>
                     </IconButton>
@@ -223,6 +228,11 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
                 role={modalState.role}
                 onPlayerSelect={handlePlayerSelect}
                 selectedPlayers={teamData.team}
+            />
+
+            <CmpMyTeamsDelete
+                open={modalDeleteState.open}
+                onClose={handleDeleteClose}
             />
         </React.Fragment>
     );

@@ -24,6 +24,12 @@ class Team{
         await db.query('UPDATE teams SET team = ?, price = ? WHERE id = ?', [team, price, id]);
         return { status: 200, message: 'Il team ' + res[0].name + ' è stato aggiornato con successo' };
     }
+
+    static async deleteTeam(id) {
+        const [res] = await db.query('SELECT name FROM teams WHERE id = ?', [id]);
+        await db.query('DELETE FROM teams WHERE id = ?', [id]);
+        return { status: 200, message: 'Il team ' + res[0].name + ' è stato rimosso con successo' };
+    }
 }
 
 module.exports= Team;
