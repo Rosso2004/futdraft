@@ -12,12 +12,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {Typography, TableSortLabel, TablePagination, TextField, Grid, Fab, Button} from "@mui/material";
+import {Typography, TableSortLabel, TablePagination, TextField, Grid, Fab, Button, InputAdornment} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
 import {ITeam} from "../../interfaces/ITeam.ts";
 import {IPlayer} from "../../interfaces/IPlayer.ts";
-import {Add, Delete} from "@mui/icons-material";
+import {Add, Delete, EuroSymbol} from "@mui/icons-material";
 import {IRole} from "../../interfaces/IRole.ts";
 import CmpSquadBuilderModal from "../squadBuilder/form/CmpSquadBuilderModal.tsx";
 import {toast} from "react-toastify";
@@ -43,6 +43,15 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
     const [open, setOpen] = React.useState(false);
     const [modalState, setModalState] = useState({ open: false, role: { id: 0, name: '' }, position: { row: 0, col: 0 } });
     const [modalDeleteState, setModalDeleteState] = useState({ open: false});
+    const [budget, setBudget] = useState({
+        value: 0,
+        sales: 0,
+        error: {
+            value: ''
+        }
+    });
+    // const [budgetError, setBudgetError] = useState<string>('');
+    // const [salesMoney, setSalesMoney] = useState<number>(0);
 
     const module = useMemo(() => {
         return row.team.map((io) => io.length);
@@ -59,6 +68,32 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
         setIsModified(hasChanges);
     }, [teamData, row.team]);
 
+    const handleChangeBudget = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setBudget((prevData) => ({
+            ...prevData,
+            value: Number(value)
+        }))
+    };
+
+    const handleBlurBudget = () => {
+        if (budget.value < budget.sales) {
+            setBudget((prevData) => ({
+                ...prevData,
+                error: {
+                    value: `Il valore inserito non è corretto. Deve essere maggiore di ${budget.sales.toLocaleString('it-IT')}`
+                }
+            }))
+        } else {
+            setBudget((prevData) => ({
+                ...prevData,
+                error: {
+                    value: ''
+                }
+            }))
+        }
+    };
+
     const handleRemovePlayer = (rowIndex: number, colIndex: number) => {
         const playerPrice = teamData.team[rowIndex][colIndex]?.price ?? 0;
         const newPrice = teamData.price - playerPrice;
@@ -73,15 +108,29 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
 
         const hasChanges = JSON.stringify(newTeam) !== JSON.stringify(row.team);
         setIsModified(hasChanges);
+        setBudget((prevData) => ({
+            ...prevData,
+            value: budget.value+playerPrice,
+            sales: budget.sales+playerPrice
+        }))
     };
 
     const handlePlayerSelect = (player: IPlayer) => {
         const newPrice = teamData.price + player.price
-        setTeamData(prevState => {
-            const newTeam = prevState.team.map(row => [...row]);
-            newTeam[modalState.position.row][modalState.position.col] = player;
-            return { ...prevState, price: newPrice, team: newTeam };
-        });
+        if (budget.value-player.price < 0) {
+            return toast.error("Devi aggiungere un extra al budget non hai abbastanza soldi disponibili!")
+        } else {
+            setTeamData(prevState => {
+                const newTeam = prevState.team.map(row => [...row]);
+                newTeam[modalState.position.row][modalState.position.col] = player;
+                return { ...prevState, price: newPrice, team: newTeam };
+            });
+            setBudget((prevData) => ({
+                ...prevData,
+                value: budget.value-player.price,
+                sales: budget.sales-player.price
+            }))
+        }
     };
 
     const handleFabClick = (rowIndex: number, colIndex: number) => {
@@ -167,10 +216,42 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
                 <TableCell colSpan={8} sx={{backgroundColor: index % 2 === 0 ? '#ffffff' : '#fbfbfb', py: 0, borderBottom: !open ? 'none' : undefined, }}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }} component='form' onSubmit={handleSubmit}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Team
-                            </Typography>
-
+                            <Grid container spacing={2} mb={4}>
+                                <Grid item xs={6}>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Team
+                                    </Typography>
+                                </Grid>
+                                {isModified && (
+                                    <Grid item xs={6} display='flex' justifyContent='flex-end'>
+                                        <TextField
+                                            label="Budget"
+                                            value={budget.value}
+                                            onChange={handleChangeBudget}
+                                            onBlur={handleBlurBudget}
+                                            error={!!budget.error.value}
+                                            helperText={budget.error.value}
+                                            type="number"
+                                            margin="none"
+                                            size='small'
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <EuroSymbol />
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            inputProps={{
+                                                min: budget.sales,
+                                            }}
+                                            sx={inputStyle}
+                                        />
+                                    </Grid>
+                                )}
+                            </Grid>
                             <Grid container spacing={10} justifyContent="center" sx={{mb: 5}}>
                                 {module.map((item, rowIndex) => (
                                     <Grid
@@ -208,10 +289,17 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
                             {isModified && (
                                 <Grid container spacing={2}>
                                     <Grid item xs={12}>
-                                        <Box display="flex" justifyContent="flex-end" alignItems='center' mt={1}>
-                                            <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
-                                                Nuovo prezzo: € {teamData.price.toLocaleString('it-IT')}
-                                            </Typography>
+                                        <Box display="flex" justifyContent="flex-end" alignItems='flex-end' mt={1}>
+                                            <Box display="flex" alignItems="flex-end" flexDirection='column' mt={1}>
+                                                <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
+                                                    Nuovo prezzo: € {teamData.price.toLocaleString('it-IT')}
+                                                </Typography>
+                                                {(teamData.price+budget.value-row.price > 0) && (
+                                                    <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
+                                                        Aggiunti al Budget: € {(teamData.price+budget.value-row.price).toLocaleString('it-IT')}
+                                                    </Typography>
+                                                )}
+                                            </Box>
                                             <Button type='submit'>Salva</Button>
                                         </Box>
                                     </Grid>
