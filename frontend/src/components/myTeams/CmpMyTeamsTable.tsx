@@ -233,6 +233,8 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
             <CmpMyTeamsDelete
                 open={modalDeleteState.open}
                 onClose={handleDeleteClose}
+                data={row}
+                fetch={fetchPlayers}
             />
         </React.Fragment>
     );

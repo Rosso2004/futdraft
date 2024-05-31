@@ -1,13 +1,36 @@
-import {Modal, Paper} from "@mui/material";
+import {Box, Button, Modal, Paper} from "@mui/material";
 import React from "react";
+import {Check, Close, Warning} from "@mui/icons-material";
+import {ITeam} from "../../interfaces/ITeam.ts";
+import axios from "axios";
+import {toast} from "react-toastify";
 
 interface ICmpMyTeamsDelete {
     open: boolean;
     onClose: () => void;
+    data: ITeam;
+    fetch: () => void;
 }
 
 const CmpMyTeamsDelete: React.FC<ICmpMyTeamsDelete> = (props) => {
-    const { open, onClose } = props;
+    const { open, onClose, data, fetch } = props;
+    console.log(data)
+
+
+    const handleDelete = async () => {
+        axios
+            .delete(import.meta.env.VITE_URL_WEB_API + '/api/team/deleteTeam/' + data.id, { withCredentials: true })
+            .then((response) => {
+                if (response.status === 200) {
+                    onClose();
+                    toast.warning(response.data.message);
+                    fetch();
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    }
 
     return (
         <Modal
@@ -26,7 +49,18 @@ const CmpMyTeamsDelete: React.FC<ICmpMyTeamsDelete> = (props) => {
                        p: 1,
                    }}
             >
-            <p style={{textAlign:'center'}}>Sei sicuro di voler rimuovere questo team?<br/>L'azione sarà irreversibile!</p>
+                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                    <Warning sx={{color:'#fbbf24', fontSize:'75px'}}/>
+                    <p style={{textAlign:'center', fontSize:'20px'}}>Sei sicuro di voler rimuovere {data.name}?<br/>L'azione sarà irreversibile!</p>
+                    <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2}}>
+                        <Button variant="contained" startIcon={<Close/>} color='error' onClick={onClose}>
+                            Annulla
+                        </Button>
+                        <Button variant="contained" startIcon={<Check/>} color='success' onClick={() => handleDelete()}>
+                            Conferma
+                        </Button>
+                    </Box>
+                </Box>
             </Paper>
         </Modal>
     );
