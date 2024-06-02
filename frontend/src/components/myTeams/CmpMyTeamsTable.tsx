@@ -174,6 +174,13 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
             .then((response)=>{
                 if (response.status === 200) {
                     toast.success(response.data.message);
+                    setBudget({
+                        value: 0,
+                        sales: 0,
+                        error: {
+                            value: ''
+                        }
+                    })
                     fetchPlayers();
                 }
             })

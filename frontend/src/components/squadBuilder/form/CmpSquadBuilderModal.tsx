@@ -4,7 +4,8 @@ import {
     Typography,
     FormControl,
     Button,
-    Autocomplete, TextField, InputAdornment
+    Autocomplete, TextField, InputAdornment, Switch,
+    FormGroup, FormControlLabel
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
@@ -25,6 +26,7 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
     const { open, onClose, role, onPlayerSelect, selectedPlayers } = props;
     const [players, setPlayers] = useState<IPlayer[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<IPlayer | null>(null);
+    const [checkedStatistics, setCheckedStatistics] = React.useState<boolean>(false);
 
     useEffect(() => {
         if (open) {
@@ -39,6 +41,7 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                 .catch(error => {
                     console.error('Errore nel recupero dei dati:', error);
                 });
+            setCheckedStatistics(false);
         }
     }, [open, role.id, selectedPlayers]);
 
@@ -50,8 +53,60 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
         if (selectedPlayer) {
             onPlayerSelect(selectedPlayer);
             onClose();
+            setCheckedStatistics(false);
             setSelectedPlayer(null);
         }
+    };
+
+    const getVisibleFields = (players: IPlayer[]): (keyof IPlayer)[] => {
+        const numericFields: (keyof IPlayer)[] = [
+            'average_clean_sheet',
+            'average_save',
+            'average_goals_conceded',
+            'average_contrasts_won',
+            'average_advances',
+            'avarage_yellow_season',
+            'average_passing_accuracy',
+            'average_balls_recovered',
+            'average_assist',
+            'average_goal',
+            'average_dribbling',
+            'average_shots_on_goal'
+        ];
+
+        return numericFields.filter(field => players.some(player => player[field] !== null));
+    };
+
+    const fieldProperties: { [key in keyof IPlayer]?: { label: string, adornment: React.ReactNode } } = {
+        average_clean_sheet: { label: 'Clean Sheets', adornment: <PersonAdd /> },
+        average_save: { label: 'Saves', adornment: <PersonAdd /> },
+        average_goals_conceded: { label: 'Goals Conceded', adornment: <PersonAdd /> },
+        average_contrasts_won: { label: 'Contrasts Won', adornment: <PersonAdd /> },
+        average_advances: { label: 'Advances', adornment: <PersonAdd /> },
+        avarage_yellow_season: { label: 'Yellow Cards', adornment: <PersonAdd /> },
+        average_passing_accuracy: { label: 'Passing Accuracy', adornment: <PersonAdd /> },
+        average_balls_recovered: { label: 'Balls Recovered', adornment: <PersonAdd /> },
+        average_assist: { label: 'Assists', adornment: <PersonAdd /> },
+        average_goal: { label: 'Average Goals', adornment: <PersonAdd /> },
+        average_dribbling: { label: 'Dribbling', adornment: <PersonAdd /> },
+        average_shots_on_goal: { label: 'Shots on Goal', adornment: <PersonAdd /> },
+    };
+
+    const visibleFields = getVisibleFields(players);
+
+    const maxValues: { [key in keyof IPlayer]?: number } = {
+        average_clean_sheet: 1,
+        average_save: 7,
+        average_goals_conceded: 5,
+        average_contrasts_won: 5,
+        average_advances: 4,
+        avarage_yellow_season: 1,
+        average_passing_accuracy: 1,
+        average_balls_recovered: 10,
+        average_assist: 2,
+        average_goal: 2,
+        average_dribbling: 4,
+        average_shots_on_goal: 5,
     };
 
     return (
@@ -74,7 +129,45 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                 <Typography id="modal-title" variant="h6" component="h2">
                     Seleziona {role.name}
                 </Typography>
-                <Typography id="modal-description" sx={{ mt: 2 }}>
+
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={checkedStatistics}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setCheckedStatistics(event.target.checked)}
+                            />
+                        }
+                        label="Filtra per statistiche" />
+                </FormGroup>
+                {checkedStatistics && (
+                    <>
+                        {visibleFields.map((field, index) => (
+                            <TextField
+                                key={index}
+                                label={fieldProperties[field]?.label}
+                                type="number"
+                                fullWidth
+                                margin="none"
+                                size='small'
+                                variant="outlined"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                InputProps={{
+                                    inputProps: { min: 0, max: 100 },
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            {fieldProperties[field]?.adornment}
+                                        </InputAdornment>
+                                    )
+                                }}
+                                sx={inputStyle}
+                            />
+                        ))}
+                    </>
+                )}
+                <Typography id="modal-description">
                     Numero di giocatori disponibili: {players.length}
                 </Typography>
                 <FormControl fullWidth sx={{ ...inputStyle, mt: 2 }}>

@@ -101,12 +101,14 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
             .then((response)=>{
                 if (response.status === 200) {
                     toast.success(response.data.message);
-                    setTeamData((prevData) => ({
-                        ...prevData,
+                    setTeamData({
+                        name: '',
+                        team: module.map(row => Array(row).fill(null)),
+                        price: 0,
                         error: {
-                            name: '',
+                            name: ''
                         }
-                    }));
+                    })
                 }
             })
             .catch((error) => {
