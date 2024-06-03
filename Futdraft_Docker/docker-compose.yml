@@ -1,0 +1,30 @@
+services:
+  app_futdraft:
+    container_name: fe-futdraft
+    restart: unless-stopped
+    image: futdraftfe
+    networks:
+      - default
+    ports:
+      - "8095:80"
+    expose:
+      - '8095'
+    volumes:
+      - ./config.js:/usr/share/nginx/html/config.js
+
+  api_futdraft:
+    container_name: be-futdraft
+    image: futdraftbe
+    restart: always
+    networks:
+      - default
+    ports:
+      - "5065:5000"
+    environment:
+      DB_HOST: 'db_vba'
+      DB_USER: 'root'
+      DB_PASSWORD: 'MyMysqlP455w0rd!'
+      DB_NAME: 'futdraft'
+      PORT: '5000'
+      TOKEN_SECRET: 'ddac02009daea8818b672a059e91b43f410419f1b3a22ddba4b611a70e>
+      DOMAIN: 'https://futdraft.redshome.it'
