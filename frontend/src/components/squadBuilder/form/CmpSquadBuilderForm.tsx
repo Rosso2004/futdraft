@@ -169,41 +169,43 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
                 ))}
             </Grid>
 
-            <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <TextField
-                        margin="none"
-                        required
-                        fullWidth
-                        size='small'
-                        label="Nome Team"
-                        value={teamData.name}
-                        error={!!teamData.error.name}
-                        helperText={teamData.error.name}
-                        onChange={(e) => setTeamData(prevState => ({ ...prevState, name: e.target.value }))}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <People />
-                                </InputAdornment>
-                            ),
-                        }}
-                        autoFocus
-                        sx={inputStyle}
-                    />
-
-                    <Box display="flex" justifyContent="space-between" alignItems='center' mt={1}>
-                        <Typography variant="h6" component="h6" sx={(teamData.price > budget && budget !== 0) ? {color: '#BB0000', fontWeight: 'bold'} : {color: '#008800', fontWeight: 'bold'}}>
-                            € {teamData.price.toLocaleString('it-IT')}
-                        </Typography>
-                        <Button
-                            type='submit'
-                            color='info'
-                            variant='contained'
-                            startIcon={<Save/>}
-                        >
-                            Salva
-                        </Button>
+            <Grid container>
+                <Grid item xs={12}>
+                    <Box display="flex" justifyContent="space-between" flexDirection='column' mt={1} sx={{gap:2}}>
+                        <Box sx={{textAlign:'right'}}>
+                            <TextField
+                                margin="none"
+                                required
+                                size='small'
+                                label="Nome Team"
+                                value={teamData.name}
+                                error={!!teamData.error.name}
+                                helperText={teamData.error.name}
+                                onChange={(e) => setTeamData(prevState => ({ ...prevState, name: e.target.value }))}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <People />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                autoFocus
+                                sx={inputStyle}
+                            />
+                        </Box>
+                        <Box display="flex" justifyContent="space-between" alignItems='center' flexDirection='row'>
+                            <Typography variant="h6" component="h6" sx={(teamData.price > budget && budget !== 0) ? {color: '#BB0000', fontWeight: 'bold'} : {color: '#008800', fontWeight: 'bold'}}>
+                                € {teamData.price.toLocaleString('it-IT')}
+                            </Typography>
+                            <Button
+                                type='submit'
+                                color='info'
+                                variant='contained'
+                                startIcon={<Save/>}
+                            >
+                                Salva
+                            </Button>
+                        </Box>
                     </Box>
                 </Grid>
             </Grid>

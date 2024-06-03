@@ -56,33 +56,15 @@ class User{
         return { status: 200, message: 'Utente autenticato con successo', data: {id: results[0].id, lastname: results[0].lastname, firstname: results[0].firstname, email: results[0].email}};
     }
 
-    static async changeUserPassword(email, old_password, new_password) {
-        const [checkResults] = await db.query('SELECT email, password FROM users WHERE email = ?', [email]);
-
-        if (checkResults.length === 0) {
-            return {status: 404, message: 'Utente non trovato'};
-        } else if (checkResults.length === 1) {
-            const dbPassword = checkResults[0].password;
-            const isMatch = await bcrypt.compare(old_password, dbPassword);
-
-            if (isMatch) {
-                const hashedPassword = await bcrypt.hash(new_password, 10);
-                await db.query('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, email]);
-                return {status: 200, message: 'Password aggiornata con successo'};
-            } else {
-                return { status: 401, message: 'Password non valida' };
-            }
-        }
-    }
-
     static async deleteUser(id) {
         const [checkResults] = await db.query('SELECT id FROM users WHERE id = ?', [id]);
 
         if (checkResults.length === 0) {
             return { status: 404, message: 'Utente non trovato' };
         } else if (checkResults.length === 1) {
-            await db.query('DELETE FROM customer WHERE id = ?', [id]);
-            return { status: 200, message: 'Utente rimosso con successo' };
+            await db.query('DELETE FROM teams WHERE user = ?', [id]);
+            await db.query('DELETE FROM users WHERE id = ?', [id]);
+            return { status: 200, message: 'Hai rimosso il tuo utente con successo!' };
         }
     }
 }

@@ -1,5 +1,5 @@
 import {
-    Avatar, Button,
+    Avatar, Box, Button,
     FormControl, FormHelperText,
     Grid,
     IconButton,
@@ -9,11 +9,13 @@ import {
     TextField
 } from "@mui/material";
 import {IUser} from "../../interfaces/IUser.ts";
-import {Email, Lock, Save, TextFields, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Delete, Email, Lock, Save, TextFields, Visibility, VisibilityOff} from "@mui/icons-material";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {toast} from "react-toastify";
+import * as React from "react";
+import CmpDeleteProfile from "./CmpDeleteProfile.tsx";
 
 interface ICmpEditProfile {
     data: IUser
@@ -33,6 +35,7 @@ interface IUpdateData {
 
 const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
     const {data} = props;
+    const [modalDeleteState, setModalDeleteState] = useState({ open: false});
     const [updateData, setUpdateData] = useState<IUpdateData>({
         id: null,
         lastname: '',
@@ -104,125 +107,157 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
             });
     };
 
+    const handleDeleteClose = () => setModalDeleteState({ open: false});
+
     return (
-        <Grid container spacing={4}>
-            <Grid item xs={12} sm={4} style={{ display: 'flex', justifyContent: 'center'}}>
-                <Avatar sx={{ width: 250, height: 250, margin: 'auto' }}>
-                    {updateData.firstname[0]}
-                </Avatar>
-            </Grid>
+        <>
+            <Grid container spacing={4}>
+                <Grid item xs={12} sm={4} style={{ display: 'flex', justifyContent: 'center'}}>
+                    <Avatar sx={{ width: 250, height: 250, margin: 'auto' }}>
+                        {updateData.firstname[0]}
+                    </Avatar>
+                </Grid>
 
-            <Grid item xs={12} sm={8} component='form' onSubmit={handleSubmit}>
-                <TextField
-                    size="small"
-                    margin="dense"
-                    required
-                    fullWidth
-                    label="Cognome"
-                    value={updateData.lastname}
-                    onChange={(e) => {
-                        setUpdateData((prevData) => ({
-                            ...prevData,
-                            lastname: e.target.value
-                        }))
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <TextFields />
-                            </InputAdornment>
-                        ),
-                    }}
-                    autoFocus
-                    sx={inputStyle}
-                />
-                <TextField
-                    size="small"
-                    margin="dense"
-                    required
-                    fullWidth
-                    label="Nome"
-                    value={updateData.firstname}
-                    onChange={(e) => {
-                        setUpdateData((prevData) => ({
-                            ...prevData,
-                            firstname: e.target.value
-                        }))
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <TextFields />
-                            </InputAdornment>
-                        ),
-                    }}
-                    autoFocus
-                    sx={inputStyle}
-                />
-                <TextField
-                    size="small"
-                    margin="dense"
-                    required
-                    fullWidth
-                    label="Email"
-                    error={!!updateData.error.email}
-                    helperText={updateData.error.email}
-                    value={updateData.email}
-                    onChange={(e) => {
-                        setUpdateData((prevData) => ({
-                            ...prevData,
-                            email: e.target.value
-                        }))
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Email />
-                            </InputAdornment>
-                        ),
-                    }}
-                    autoFocus
-                    sx={inputStyle}
-                />
-                <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth size="small" error={!!updateData.error.password}>
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                    <OutlinedInput
-                        id="outlined-adornment-password"
-                        type={showPassword ? 'text' : 'password'}
-                        startAdornment={
-                            <InputAdornment position="start">
-                                <Lock />
-                            </InputAdornment>
-                        }
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                        label="Password"
-
-                        value={updateData.password}
+                <Grid item xs={12} sm={8} component='form' onSubmit={handleSubmit}>
+                    <TextField
+                        size="small"
+                        margin="dense"
+                        required
+                        fullWidth
+                        label="Cognome"
+                        value={updateData.lastname}
                         onChange={(e) => {
                             setUpdateData((prevData) => ({
                                 ...prevData,
-                                password: e.target.value
+                                lastname: e.target.value
                             }))
                         }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <TextFields />
+                                </InputAdornment>
+                            ),
+                        }}
+                        autoFocus
+                        sx={inputStyle}
                     />
-                    <FormHelperText>{updateData.error.password}</FormHelperText>
-                </FormControl>
-                <Button type="submit" fullWidth variant="contained" color='info' sx={{
-                    mt: 3,
-                    mb: 2,
-                }}
-                startIcon={<Save/>}>Salva</Button>
+                    <TextField
+                        size="small"
+                        margin="dense"
+                        required
+                        fullWidth
+                        label="Nome"
+                        value={updateData.firstname}
+                        onChange={(e) => {
+                            setUpdateData((prevData) => ({
+                                ...prevData,
+                                firstname: e.target.value
+                            }))
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <TextFields />
+                                </InputAdornment>
+                            ),
+                        }}
+                        autoFocus
+                        sx={inputStyle}
+                    />
+                    <TextField
+                        size="small"
+                        margin="dense"
+                        required
+                        fullWidth
+                        label="Email"
+                        error={!!updateData.error.email}
+                        helperText={updateData.error.email}
+                        value={updateData.email}
+                        onChange={(e) => {
+                            setUpdateData((prevData) => ({
+                                ...prevData,
+                                email: e.target.value
+                            }))
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Email />
+                                </InputAdornment>
+                            ),
+                        }}
+                        autoFocus
+                        sx={inputStyle}
+                    />
+                    <FormControl sx={inputStyle} variant="outlined" margin="dense" required fullWidth size="small" error={!!updateData.error.password}>
+                        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                        <OutlinedInput
+                            id="outlined-adornment-password"
+                            type={showPassword ? 'text' : 'password'}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <Lock />
+                                </InputAdornment>
+                            }
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            label="Password"
+
+                            value={updateData.password}
+                            onChange={(e) => {
+                                setUpdateData((prevData) => ({
+                                    ...prevData,
+                                    password: e.target.value
+                                }))
+                            }}
+                        />
+                        <FormHelperText>{updateData.error.password}</FormHelperText>
+                    </FormControl>
+                    <Box sx={{display: 'flex', gap: 2, mt:2}}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color='error'
+                            sx={{
+                                fontWeight: 700,
+                            }}
+                            onClick={() => setModalDeleteState({ open: true})}
+                            startIcon={<Delete/>}
+                        >
+                            Elimina Utente
+                        </Button>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color='info'
+                            sx={{
+                                fontWeight: 700,
+                            }}
+                            startIcon={<Save/>}
+                        >
+                            Salva
+                        </Button>
+                    </Box>
+                </Grid>
             </Grid>
-        </Grid>
+
+            <CmpDeleteProfile
+                open={modalDeleteState.open}
+                onClose={handleDeleteClose}
+                data={data}
+                // fetch={fetchPlayers}
+            />
+    </>
     );
 };
 

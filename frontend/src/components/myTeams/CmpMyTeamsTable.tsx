@@ -17,7 +17,7 @@ import {useEffect, useMemo, useState} from "react";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
 import {ITeam} from "../../interfaces/ITeam.ts";
 import {IPlayer} from "../../interfaces/IPlayer.ts";
-import {Add, Delete, EuroSymbol} from "@mui/icons-material";
+import {Add, Delete, EuroSymbol, Save} from "@mui/icons-material";
 import {IRole} from "../../interfaces/IRole.ts";
 import CmpSquadBuilderModal from "../squadBuilder/form/CmpSquadBuilderModal.tsx";
 import {toast} from "react-toastify";
@@ -295,19 +295,44 @@ function Row(props: { row: ITeam; index: number; fetchPlayers: () => void }) {
                             </Grid>
                             {isModified && (
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <Box display="flex" justifyContent="flex-end" alignItems='flex-end' mt={1}>
-                                            <Box display="flex" alignItems="flex-end" flexDirection='column' mt={1}>
-                                                <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
-                                                    Nuovo prezzo: € {teamData.price.toLocaleString('it-IT')}
+                                    <Grid item xs={6}>
+                                        <Grid container>
+                                            <Grid item xs={4}>
+                                                <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18, fontWeight: 'bold'}}>
+                                                    Nuovo prezzo:
                                                 </Typography>
-                                                {(teamData.price+budget.value-row.price > 0) && (
-                                                    <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18}}>
-                                                        Aggiunti al Budget: € {(teamData.price+budget.value-row.price).toLocaleString('it-IT')}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                            <Button type='submit'>Salva</Button>
+                                            </Grid>
+                                            <Grid item xs={8}>
+                                                <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18, fontWeight: 'bold'}}>
+                                                    € {teamData.price.toLocaleString('it-IT')}
+                                                </Typography>
+                                            </Grid>
+                                            {(teamData.price+budget.value-row.price > 0) && (
+                                                <>
+                                                    <Grid item xs={4}>
+                                                        <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18, fontWeight: 'bold'}}>
+                                                            Aggiunti al Budget:
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={8}>
+                                                        <Typography variant="h6" component="h6" sx={{mr: 4, fontSize: 18, fontWeight: 'bold'}}>
+                                                            € {(teamData.price+budget.value-row.price).toLocaleString('it-IT')}
+                                                        </Typography>
+                                                    </Grid>
+                                                </>
+                                            )}
+                                        </Grid>
+                                    </Grid>
+                                    <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                        <Box sx={{ flexGrow: 1 }} />
+                                        <Box sx={{ textAlign: 'right' }}>
+                                            <Button
+                                                type='submit'
+                                                color='info'
+                                                sx={{fontweight: 700}}
+                                                startIcon={<Save/>}
+                                                variant="contained">Salva
+                                            </Button>
                                         </Box>
                                     </Grid>
                                 </Grid>

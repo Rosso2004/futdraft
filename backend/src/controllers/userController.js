@@ -2,6 +2,7 @@ const express=require('express');
 const User=require('../models/userModel');
 const authenticateToken = require("../middleware/authentication");
 const jwt = require("jsonwebtoken");
+const Team = require("../models/teamModel");
 
 const router=express.Router();
 
@@ -53,13 +54,12 @@ router.post('/verifyUser', async (req, res) => {
     }
 });
 
-router.put('/changeUserPassword/:id', async (req, res) => {
-    const { old_password, new_password } = req.body;
-    const chPwdUser = await User.changeUserPassword(req.params.id, old_password, new_password);
-    if (chPwdUser.status === 200) {
-        res.json(chPwdUser);
+router.delete('/deleteUser/:id', authenticateToken, async (req, res) => {
+    const delUser = await User.deleteUser(req.params.id);
+    if (delUser.status === 200) {
+        res.json(delUser);
     } else {
-        res.status(chPwdUser.status).json(chPwdUser.message);
+        res.status(delUser.status).json(delUser.message);
     }
 });
 

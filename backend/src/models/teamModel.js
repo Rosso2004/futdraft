@@ -10,7 +10,7 @@ class Team{
     }
 
     static async createTeam(user,name,team,price) {
-        const [checkResults] = await db.query('SELECT name FROM teams WHERE name = ?', [name]);
+        const [checkResults] = await db.query('SELECT name FROM teams WHERE name = ? AND user = ?', [name, user]);
         if (checkResults.length > 0) {
             return { status: 409, message: 'Un team con lo stesso nome è già presente nel sistema' };
         } else if (checkResults.length === 0){

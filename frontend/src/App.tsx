@@ -1,11 +1,12 @@
 import {Routes, Route, useLocation} from 'react-router-dom';
-import {ReactNode, useEffect} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import CmpLayout from "./components/layout/CmpLayout.tsx";
 import { useGlobalState } from "./global/GlobalStateContext.tsx";
-import {ToastContainer} from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {ConfigNavigation} from "./components/layout/ConfigNavigation.tsx";
 import useTokenCheck from "./utility/useTokenCheck.tsx";
+import axios from "axios";
 
 interface ProtectedRouteProps {
     element: ReactNode;
@@ -17,17 +18,27 @@ const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
 };
 
 function App() {
-    const { setTitlePage } = useGlobalState();
+    const { setTitlePage, isVerified } = useGlobalState();
     const location = useLocation();
+    const [avatarData, setAvatarData] = useState('');
 
     useEffect(() => {
         const currentRoute = ConfigNavigation.find(route => route.path === location.pathname);
         const title = currentRoute ? currentRoute.title : 'Dashboard';
         setTitlePage(title);
-    }, [location.pathname, setTitlePage]);
+        if (isVerified) {
+            axios.get(import.meta.env.VITE_URL_WEB_API + '/api/user/getUser', { withCredentials: true })
+                .then(response => {
+                    setAvatarData(response.data.firstname[0]);
+                })
+                .catch(error => {
+                    toast.error(error.response.message);
+                });
+        }
+    }, [isVerified, location.pathname, setTitlePage]);
 
     return (
-        <CmpLayout title={ConfigNavigation.find(route => route.path === location.pathname)?.title || 'Dashboard'} maxWidth={"xl"}>
+        <CmpLayout title={ConfigNavigation.find(route => route.path === location.pathname)?.title || 'Dashboard'} maxWidth={"xl"} avatarData={avatarData}>
             <Routes>
                 {ConfigNavigation.map((route, index) => (
                     <Route
