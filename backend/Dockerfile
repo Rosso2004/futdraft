@@ -6,7 +6,7 @@ WORKDIR /app
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copi>
 # where available (npm@5+)
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json ./
 
 RUN npm install --frozen-lockfile
 #RUN npm install
