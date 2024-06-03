@@ -12,6 +12,29 @@ services:
     volumes:
       - ./config.js:/usr/share/nginx/html/config.js
 
+  db_futdraft:
+    image: mysql
+    restart: always
+    networks:
+      - default
+    environment:
+      MYSQL_DATABASE: 'futdraft'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'MyMysqlP455w0rd!'
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '3396:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3396'
+      # Where our data will be persisted
+    volumes:
+      - my-db-futdraft:/var/lib/mysql
+
   api_futdraft:
     container_name: be-futdraft
     image: futdraftbe
@@ -21,10 +44,13 @@ services:
     ports:
       - "5065:5000"
     environment:
-      DB_HOST: 'db_vba'
+      DB_HOST: 'db_futdraft'
       DB_USER: 'root'
       DB_PASSWORD: 'MyMysqlP455w0rd!'
       DB_NAME: 'futdraft'
       PORT: '5000'
-      TOKEN_SECRET: 'ddac02009daea8818b672a059e91b43f410419f1b3a22ddba4b611a70e>
+      TOKEN_SECRET: 'ddac02009daea8818b672a059e91b43f410419f1b3a22ddba4b611a70e'
       DOMAIN: 'https://futdraft.redshome.it'
+
+volumes:
+  my-db-futdraft:
