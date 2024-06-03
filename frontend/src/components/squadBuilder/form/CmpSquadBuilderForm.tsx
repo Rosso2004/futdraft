@@ -38,6 +38,7 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
         setTeamData((prevData) => ({
             ...prevData,
             team: module.map(row => Array(row).fill(null)),
+            price: 0,
         }));
     }, [module]);
 
@@ -146,7 +147,7 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
                         {Array.from({ length: item }).map((_, colIndex) => (
                             <Grid item key={colIndex} xs={12 / item} sx={{ display: 'flex', justifyContent: 'center', alignItems:'center'}}>
                                 {teamData.team[rowIndex] && teamData.team[rowIndex][colIndex] ? (
-                                    <Paper elevation={1} sx={{display:'flex', flexDirection:'column' }}>
+                                    <Paper elevation={1} sx={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
                                         <img
                                             src={teamData.team[rowIndex][colIndex]?.photo_url || undefined}
                                             style={{ width: '150px', height: 'auto' }}
