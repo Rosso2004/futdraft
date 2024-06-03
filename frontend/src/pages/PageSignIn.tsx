@@ -3,7 +3,7 @@ import {
     Container,
     Typography,
     TextField,
-    InputAdornment, FormControl, InputLabel, OutlinedInput, IconButton, Button, Link,
+    InputAdornment, FormControl, InputLabel, OutlinedInput, IconButton, Button, Link, Paper,
 } from "@mui/material";
 import {Lock, Email, Visibility, VisibilityOff, TextFields} from "@mui/icons-material";
 import {inputStyle} from "../styles/CmpStyle.tsx";
@@ -11,6 +11,7 @@ import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import * as React from "react";
 
 interface ILoginData {
     lastname: string,
@@ -69,17 +70,27 @@ const PageLogin = () => {
 
     return (
         <Container maxWidth="xs">
-            <Box sx={{
-                marginTop: 8,
+            <Paper elevation={2} sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                py: 2,
+                px: 4
             }}>
                 <Typography component="h1" variant="h3" sx={{
                     color: '#bb0000',
                     fontWeight: 700,
+                    fontSize: '2rem',
                     textAlign: 'center',
-                }}>Registrazione</Typography>
+                    display: 'flex',
+                    flexDirection:'column'
+                }}>
+                    <img src='https://imgur.com/Q0leBft.png' width='200px' alt='Logo'/>
+                </Typography>
 
                 <Box component="form" noValidate sx={{ mt: 1 }} display="flex" flexDirection="column" alignItems="center" onSubmit={handleSubmit}>
                     <TextField
@@ -184,15 +195,16 @@ const PageLogin = () => {
                     <Button type="submit" fullWidth variant="contained" sx={{
                         mt: 3,
                         mb: 2,
-                        background: '#b60000ED',
-                        color: 'white',
+                        background: '#e1ff57ED',
+                        color: 'black',
+                        fontWeight:700,
                         '&:hover': {
-                            background: '#b60000',
+                            background: '#e1ff57',
                         },
                     }}>Registrati</Button>
                     <Typography>Sei già registrato? <Link sx={{cursor: 'pointer'}} onClick={() => navigate('/')}>Accedi</Link></Typography>
                 </Box>
-            </Box>
+            </Paper>
         </Container>
     );
 };

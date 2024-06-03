@@ -150,17 +150,19 @@ const CmpLayout: React.FC<ICmpLayout> = (props) => {
                 <>
                     <Box sx={{ display: 'flex' }}>
                         <CssBaseline />
-                        <AppBar position="fixed" open={open} sx={{ backgroundColor: '#b60000' }}>
+                        <AppBar position="fixed" open={open} sx={{ backgroundColor: '#e1ff57' }}>
                             <Toolbar>
                                 {!isMobile && (
                                     <IconButton color="inherit" onClick={handleDrawerOpen} edge="start" sx={{
                                         marginRight: 5,
+                                        color:'black',
                                         ...(open && { display: 'none' }),
                                     }}>
                                         <MenuIcon />
                                     </IconButton>
                                 )}
-                                <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
+                                <Typography variant="h6" noWrap sx={{ flexGrow: 1, display:'flex', alignItems:'center', gap:1, color:'black', fontWeight:700 }} component="div">
+                                    <img src='https://imgur.com/Q0leBft.png' width='50px'/>
                                     {props.title}
                                 </Typography>
 
@@ -210,7 +212,7 @@ const CmpLayout: React.FC<ICmpLayout> = (props) => {
                                         <ListItemButton
                                             key={item.path}
                                             onClick={() => handleNavigate(item.path)}
-                                            style={location.pathname === item.path ? { borderRight: '4px solid #b60000' } : {}}
+                                            style={location.pathname === item.path ? { borderRight: '4px solid #e1ff57' } : {}}
                                         >
                                             <ListItemIcon>
                                                 <item.icon />

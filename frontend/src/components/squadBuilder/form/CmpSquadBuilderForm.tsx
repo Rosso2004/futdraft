@@ -1,5 +1,5 @@
 import {Box, Button, Fab, Grid, IconButton, InputAdornment, Paper, TextField, Typography} from "@mui/material";
-import {Add, Delete, People} from '@mui/icons-material';
+import {Add, Delete, People, Save} from '@mui/icons-material';
 import React, {useEffect, useState} from "react";
 import CmpSquadBuilderModal from "./CmpSquadBuilderModal.tsx";
 import { IRole } from "../../../interfaces/IRole.ts";
@@ -196,7 +196,14 @@ const CmpSquadBuilderForm: React.FC<ICmpSquadBuilderModuleProps> = (props) => {
                         <Typography variant="h6" component="h6" sx={(teamData.price > budget && budget !== 0) ? {color: '#BB0000', fontWeight: 'bold'} : {color: '#008800', fontWeight: 'bold'}}>
                             € {teamData.price.toLocaleString('it-IT')}
                         </Typography>
-                        <Button type='submit'>Salva</Button>
+                        <Button
+                            type='submit'
+                            color='info'
+                            variant='contained'
+                            startIcon={<Save/>}
+                        >
+                            Salva
+                        </Button>
                     </Box>
                 </Grid>
             </Grid>

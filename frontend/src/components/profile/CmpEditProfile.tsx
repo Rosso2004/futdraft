@@ -9,7 +9,7 @@ import {
     TextField
 } from "@mui/material";
 import {IUser} from "../../interfaces/IUser.ts";
-import {Email, Lock, TextFields, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Email, Lock, Save, TextFields, Visibility, VisibilityOff} from "@mui/icons-material";
 import {inputStyle} from "../../styles/CmpStyle.tsx";
 import {useEffect, useState} from "react";
 import axios from "axios";
@@ -216,15 +216,11 @@ const CmpEditProfile: React.FC<ICmpEditProfile> = (props) => {
                     />
                     <FormHelperText>{updateData.error.password}</FormHelperText>
                 </FormControl>
-                <Button type="submit" fullWidth variant="contained" sx={{
+                <Button type="submit" fullWidth variant="contained" color='info' sx={{
                     mt: 3,
                     mb: 2,
-                    background: '#b60000ED',
-                    color: 'white',
-                    '&:hover': {
-                        background: '#b60000',
-                    },
-                }}>Salva</Button>
+                }}
+                startIcon={<Save/>}>Salva</Button>
             </Grid>
         </Grid>
     );

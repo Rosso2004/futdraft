@@ -4,15 +4,14 @@ import {
     Typography,
     FormControl,
     Button,
-    Autocomplete, TextField, InputAdornment, Switch,
-    FormGroup, FormControlLabel, Grid
+    Autocomplete, TextField, InputAdornment, Switch, Grid, Box
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { IPlayer } from "../../../interfaces/IPlayer.ts";
 import { IRole } from "../../../interfaces/IRole.ts";
 import {inputStyle} from "../../../styles/CmpStyle.tsx";
-import {PersonAdd} from "@mui/icons-material";
+import {PersonAdd, BarChart, Add} from "@mui/icons-material";
 
 interface ICmpSquadBuilderModal {
     open: boolean;
@@ -114,11 +113,27 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
             return prev;
         });
     };
+    const handleCloseModal = () => {
+        onClose();
+        setFilterValues({
+            average_clean_sheet: 0,
+            average_save: 0,
+            average_goals_conceded: 0,
+            average_contrasts_won: 0,
+            average_advances: 0,
+            average_passing_accuracy: 0,
+            average_balls_recovered: 0,
+            average_assist: 0,
+            average_goal: 0,
+            average_dribbling: 0,
+            average_shots_on_goal: 0,
+        })
+    }
 
     const handlePlayerSelect = () => {
         if (selectedPlayer) {
             onPlayerSelect(selectedPlayer);
-            onClose();
+            handleCloseModal()
             setCheckedStatistics(false);
             setSelectedPlayer(null);
         }
@@ -144,17 +159,17 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
     };
 
     const fieldProperties: { [key in keyof IPlayer]?: { label: string, adornment: React.ReactNode } } = {
-        average_clean_sheet: { label: 'Media Cleansheet ≥', adornment: <PersonAdd /> },
-        average_save: { label: 'Media Parate ≥', adornment: <PersonAdd /> },
-        average_goals_conceded: { label: 'Media Goal Subiti ≥', adornment: <PersonAdd /> },
-        average_contrasts_won: { label: 'Media Contrasti Vinti ≥', adornment: <PersonAdd /> },
-        average_advances: { label: 'Media Anticipi ≥', adornment: <PersonAdd /> },
-        average_passing_accuracy: { label: 'Media Precisione Passaggi ≥', adornment: <PersonAdd /> },
-        average_balls_recovered: { label: 'Media Palle Recuperate ≥', adornment: <PersonAdd /> },
-        average_assist: { label: 'Media Assist ≥', adornment: <PersonAdd /> },
-        average_goal: { label: 'Media Goal ≥', adornment: <PersonAdd /> },
-        average_dribbling: { label: 'Media Dribbling ≥', adornment: <PersonAdd /> },
-        average_shots_on_goal: { label: 'Media Tiri in Porta ≥', adornment: <PersonAdd /> },
+        average_clean_sheet: { label: 'Media Cleansheet ≥', adornment: <BarChart /> },
+        average_save: { label: 'Media Parate ≥', adornment: <BarChart /> },
+        average_goals_conceded: { label: 'Media Goal Subiti ≥', adornment: <BarChart /> },
+        average_contrasts_won: { label: 'Media Contrasti Vinti ≥', adornment: <BarChart /> },
+        average_advances: { label: 'Media Anticipi ≥', adornment: <BarChart /> },
+        average_passing_accuracy: { label: 'Media Precisione Passaggi ≥', adornment: <BarChart /> },
+        average_balls_recovered: { label: 'Media Palle Recuperate ≥', adornment: <BarChart /> },
+        average_assist: { label: 'Media Assist ≥', adornment: <BarChart /> },
+        average_goal: { label: 'Media Goal ≥', adornment: <BarChart /> },
+        average_dribbling: { label: 'Media Dribbling ≥', adornment: <BarChart /> },
+        average_shots_on_goal: { label: 'Media Tiri in Porta ≥', adornment: <BarChart /> },
     };
 
     const visibleFields = getVisibleFields(players);
@@ -163,7 +178,7 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={handleCloseModal}
             aria-labelledby="modal-title"
             aria-describedby="modal-description"
         >
@@ -213,8 +228,14 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                                             <InputAdornment position="start">
                                                 {fieldProperties[field]?.adornment}
                                             </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                %
+                                            </InputAdornment>
                                         )
                                     }}
+
                                     sx={inputStyle}
                                     onChange={handleFilterChange(field)}
                                     value={filterValues[field] ?? ''}
@@ -253,14 +274,19 @@ const CmpSquadBuilderModal: React.FC<ICmpSquadBuilderModal> = (props) => {
                         isOptionEqualToValue={(option, value) => option.id === value.id}
                     />
                 </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handlePlayerSelect}
-                    sx={{ mt: 2 }}
-                >
-                    Seleziona
-                </Button>
+                <Box sx={{textAlign: 'right'}}>
+                    <Button
+                        variant="contained"
+                        onClick={handlePlayerSelect}
+                        color='success'
+                        sx={{
+                            mt: 2,
+                        }}
+                        startIcon={<Add/>}
+                    >
+                        Aggiugi
+                    </Button>
+                </Box>
             </Paper>
         </Modal>
     );
